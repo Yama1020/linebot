@@ -1,2 +1,0 @@
-# linebot
-Team 7
