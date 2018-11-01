@@ -1,14 +1,6 @@
-html_body = '''<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8">
-    <title>CGI</title>
-  </head>
-  <body>
-    Hello World
-  </body>
-</html>'''
+from flask import Flask
+app = Flask(__name__)
 
-print('Content-type: text/html')
-print('')
-print(html_body)
+@app.route("/")
+def hello():
+    return "Hello World!"
