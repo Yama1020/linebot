@@ -4,5 +4,6 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    test = numpy.random.rand()
-    return test
+    test = str(numpy.random.rand())
+    out = "Hello World" + test
+    return out
