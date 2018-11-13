@@ -24,7 +24,7 @@ handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
 @app.route("/")
 def hello():
-    text = YOUR_CHANNEL_ACCESS_TOKEN + YOUR_CHANNEL_SECRET
+    text = "Hello World!"
     return text
 
 @app.route('/webhook', methods=['POST'])
