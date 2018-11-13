@@ -25,6 +25,10 @@ def hello():
     text = YOUR_CHANNEL_ACCESS_TOKEN + YOUR_CHANNEL_SECRET
     return text
 
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    return '', 200, {}
+
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -48,3 +52,4 @@ def handle_message(event):
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=event.message.text))
+
