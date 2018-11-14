@@ -67,8 +67,7 @@ def handle_follow(event):
     user_id = event.source.user_id
     user_disp_name = profile.display_name
     
-    dbinfo = "DRIVER={SQL Server};SERVER=ds1bd5t7sqlsv.database.windows.net;UID=yamamoto;PWD=Xy2s33UP;DATABASE=ds1bd5t7sqldb"
-    # dbinfo = os.environ['CUSTOMCONNSTR_dbconn']
+    dbinfo = os.environ['CUSTOMCONNSTR_dbconn']
     
     # DB接続
     conn = pyodbc.connect(dbinfo)
