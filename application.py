@@ -7,11 +7,12 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
+    FollowEvent, MessageEvent, TextMessage, TextSendMessage,
 )
 import os
 import sys
 import json
+import pyodbc
 
 app = Flask(__name__)
 
@@ -55,3 +56,29 @@ def handle_message(event):
         event.reply_token,
         TextSendMessage(text=event.message.text))
 
+@handler.add(FollowEvent)
+def handle_follow(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text='初めまして')
+    )
+
+    profile = line_bot_api.get_profile(event.source.user_id)
+    user_id = event.source.user_id
+    user_disp_name = profile.display_name
+    
+    dbinfo = "DRIVER={SQL Server};SERVER=ds1bd5t7sqlsv.database.windows.net;UID=yamamoto;PWD=Xy2s33UP;DATABASE=ds1bd5t7sqldb"
+    # dbinfo = os.environ['CUSTOMCONNSTR_dbconn']
+    
+    # DB接続
+    conn = pyodbc.connect(dbinfo)
+    cursor = conn.cursor()
+    
+    # SQL実行
+    sql = "INSERT into AssetMng.UserID (UserID, UserName) VALUES (?, ?)"
+    cursor.execute(sql, (user_id, user_disp_name))
+    result = cursor.fetchall()
+
+    # DB切断
+    conn.close()
+    
