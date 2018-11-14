@@ -7,12 +7,11 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    FollowEvent, MessageEvent, TextMessage, TextSendMessage,
+    MessageEvent, TextMessage, TextSendMessage,
 )
 import os
 import sys
 import json
-import pyodbc
 
 app = Flask(__name__)
 
