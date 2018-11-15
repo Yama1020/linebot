@@ -28,16 +28,16 @@ def hello():
     # DB接続情報を環境変数から取得
     dbinfo = os.environ['CUSTOMCONNSTR_dbconn']
     # DB接続
-    conn = pyodbc.connect(dbinfo)
-    cursor = conn.cursor()
+    #conn = pyodbc.connect(dbinfo)
+    #cursor = conn.cursor()
     # SQL実行(貸し出し期限を過ぎた本と借りている人を抽出)
-    sql = "SELECT title from AssetMng.BookList"
-    cursor.execute(sql)
-    result = cursor.fetchall()
+    #sql = "SELECT title from AssetMng.BookList"
+    #cursor.execute(sql)
+    #result = cursor.fetchall()
     # DB切断
-    conn.close()
+    #conn.close()
     
-    return result[:] 
+    return dbinfo
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
