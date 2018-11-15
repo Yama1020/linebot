@@ -25,7 +25,7 @@ handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
 @app.route("/")
 def hello():
-    dbinfo = os.environ['CUSTOMCONNSTR_dbconn']
+    dbinfo = "hello"
     return dbinfo
 
 @app.route('/webhook', methods=['POST'])
