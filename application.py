@@ -2,6 +2,7 @@ import os, sys, json
 
 from flask import Flask, request, abort
 from flask_sqlalchemy import SQLAlchemy
+import pymysql
 
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
