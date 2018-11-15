@@ -6,4 +6,3 @@ MarkupSafe==1.0
 Werkzeug==0.14.1
 line-bot-sdk==1.8.0
 Flask-SQLAlchemy==2.3.2
-pymysql==2.1.4
