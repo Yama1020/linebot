@@ -12,6 +12,7 @@ from linebot.models import (
 import os
 import sys
 import json
+import pyodbc
 
 app = Flask(__name__)
 
@@ -24,8 +25,19 @@ handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
 @app.route("/")
 def hello():
-    text = "Hello World!"
-    return text
+    # DB接続情報を環境変数から取得
+    dbinfo = os.environ['CUSTOMCONNSTR_dbconn']
+    # DB接続
+    conn = pyodbc.connect(dbinfo)
+    cursor = conn.cursor()
+    # SQL実行(貸し出し期限を過ぎた本と借りている人を抽出)
+    sql = "SELECT title from AssetMng.BookList"
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    # DB切断
+    conn.close()
+    
+    return result[:] 
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
