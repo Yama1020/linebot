@@ -12,7 +12,6 @@ from linebot.models import (
 import os
 import sys
 import json
-import pyodbc
 
 app = Flask(__name__)
 
