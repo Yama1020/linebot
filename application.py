@@ -30,8 +30,8 @@ migrate = Migrate(app, db)
 
 class UserList(db.Model):
     __tablename__ = "userlist"
-    username = db.Column(db.Varchar(50), primary_key=True)
-    userid = db.Column(db.Varchar(50), nullable=False)
+    username = db.Column(db.String(50), primary_key=True)
+    userid = db.Column(db.String(50), nullable=False)
 
 
 #環境変数取得
