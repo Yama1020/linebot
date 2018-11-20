@@ -1,12 +1,38 @@
 import os, sys, json
 
-from flask import Flask, request, abort
+from flask import Flask, render_template, request, abort
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import FollowEvent, MessageEvent, TextMessage, TextSendMessage
 
 app = Flask(__name__)
+
+database_uri = 'postgresql+psycopg2://{dbuser}:{dbpass}@{dbhost}/{dbname}'.format(
+    dbuser=os.environ["DB_USER"],
+    dbpass=os.environ["DB_PASS"],
+    dbhost=os.environ["DB_HOST"],
+    dbname=os.environ["DB_NAME"]
+)
+
+app.config.update(
+    SQLALCHEMY_DATABASE_URI=database_uri,
+    SQLALCHEMY_TRACK_MODIFICATIONS=False,
+)
+
+# initialize the database connection
+db = SQLAlchemy(app)
+
+# initialize database migration management
+migrate = Migrate(app, db)
+
+class UserList(db.Model):
+    __tablename__ = "userlist"
+    username = db.Column(db.Varchar(50), primary_key=True)
+    userid = db.Column(db.Varchar(50), nullable=False)
+
 
 #環境変数取得
 YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
@@ -44,7 +70,21 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    repmes = str(db.session.query(UserList).all)
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=event.source.user_id))
+        TextSendMessage(text=repmes))
 
+@handler.add(FollowEvent)
+def handle_follow(event):
+    profile = line_bot_api.get_profile(event.source.user_id)
+    followname = profile.display_name
+    followid = event.source.user_id
+
+    record = UserList(username=followname, userid=followid)
+    db.session.add(record)
+    db.session.commit()
+
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="thanks for your following"))
