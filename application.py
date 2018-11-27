@@ -29,10 +29,14 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 class UserList(db.Model):
-    __tablename__ = "userlist"
-    username = db.Column(db.VARCHAR(), primary_key=True)
+    __tablename__ = "userlista"
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.VARCHAR(), nullable=False)
     userid = db.Column(db.VARCHAR(), nullable=False)
 
+    def __init__(self, username, userid):
+        self.username = username
+        self.userid = userid
 
 #環境変数取得
 YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
