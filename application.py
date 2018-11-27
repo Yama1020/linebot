@@ -44,7 +44,7 @@ handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 @app.route("/")
 def hello():
     dbq = UserList.query.all()
-    dbst = len(dbq)
+    dbst = dbq[0][0]
     return str(dbst)
 
 @app.route('/webhook', methods=['POST'])
