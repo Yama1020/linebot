@@ -30,8 +30,8 @@ migrate = Migrate(app, db)
 
 class UserList(db.Model):
     __tablename__ = "userlist"
-    username = db.Column(db.VARCHAR(50), primary_key=True)
-    userid = db.Column(db.VARCHAR(50), nullable=False)
+    username = db.Column(db.VARCHAR(), primary_key=True)
+    userid = db.Column(db.VARCHAR(), nullable=False)
 
 
 #環境変数取得
@@ -44,7 +44,8 @@ handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 @app.route("/")
 def hello():
     dbq = UserList.query.all()
-    return dbq
+    dbst = str(dbq[:])
+    return dbst
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
