@@ -43,8 +43,8 @@ handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
 @app.route("/")
 def hello():
-    dbinfo = "hello"
-    return dbinfo
+    dbq = str(db.session.query(UserList).all)
+    return dbq
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
@@ -70,7 +70,7 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    repmes = str(db.session.query(UserList).all)
+    repmes = "こんにちは"
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=repmes))
