@@ -10,7 +10,7 @@ from linebot.models import FollowEvent, MessageEvent, TextMessage, TextSendMessa
 
 app = Flask(__name__)
 
-database_uri = 'postgresql+psycopg2://{dbuser}:{dbpass}@{dbhost}/{dbname}'.format(
+database_uri = 'postgresql+psycopg2://{dbuser}:{dbpass}@{dbhost}/{dbname}?charset=utf8'.format(
     dbuser=os.environ["DB_USER"],
     dbpass=os.environ["DB_PASS"],
     dbhost=os.environ["DB_HOST"],
@@ -48,7 +48,7 @@ def hello():
     if dbst is None:
         ret = "batu"
     else:
-        ret = "maru"
+        ret = dbst
     return ret
 
 @app.route('/webhook', methods=['POST'])
