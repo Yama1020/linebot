@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import FollowEvent, MessageEvent, TextMessage, TextSendMessage
+from linebot.models import FollowEvent, UnfollowEvent, MessageEvent, TextMessage, TextSendMessage
 
 # Flaskアプリケーション初期化
 app = Flask(__name__)
@@ -101,7 +101,7 @@ def handle_message(event):
         event.reply_token,
         TextSendMessage(text=repmes))
 
-# LineBotを友達追加した際の挙動(UserListテーブルに相手のLINEの表示名、IDを追加しつつ応答を返す)
+# LineBotを友達追加orブロック解除した際の挙動(UserListテーブルに相手のLINEの表示名、IDを追加しつつ応答を返す)
 @handler.add(FollowEvent)
 def handle_follow(event):
     profile = line_bot_api.get_profile(event.source.user_id)
@@ -115,3 +115,13 @@ def handle_follow(event):
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text="thanks for your following"))
+
+# LineBotをブロックした際の挙動(UserListテーブルから相手のLINEの表示名、IDを削除する)
+@handler.add(UnfollowEvent)
+def handle_unfollow(event):
+    profile = line_bot_api.get_profile(event.source.user_id)
+    unfollowname = profile.display_name
+    unfollowid = event.source.user_id
+
+    db.session.query(UserList).filter(UserList.userid==unfollowid).delete()
+    db.session.commit()
