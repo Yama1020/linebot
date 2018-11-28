@@ -119,8 +119,6 @@ def handle_follow(event):
 # LineBotをブロックした際の挙動(UserListテーブルから相手のLINEの表示名、IDを削除する)
 @handler.add(UnfollowEvent)
 def handle_unfollow(event):
-    profile = line_bot_api.get_profile(event.source.user_id)
-    unfollowname = profile.display_name
     unfollowid = event.source.user_id
 
     db.session.query(UserList).filter(UserList.userid==unfollowid).delete()
