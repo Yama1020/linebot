@@ -8,8 +8,10 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import FollowEvent, MessageEvent, TextMessage, TextSendMessage
 
+# Flaskアプリケーション初期化
 app = Flask(__name__)
 
+# DB接続設定(セキュリティの為、各値は環境変数に記載)
 database_uri = 'postgresql://{dbuser}:{dbpass}@{dbhost}/{dbname}?client_encoding=utf8'.format(
     dbuser=os.environ["DB_USER"],
     dbpass=os.environ["DB_PASS"],
@@ -17,50 +19,63 @@ database_uri = 'postgresql://{dbuser}:{dbpass}@{dbhost}/{dbname}?client_encoding
     dbname=os.environ["DB_NAME"]
 )
 
+# Flaskアプリケーションに、DB接続設定を付与
 app.config.update(
     SQLALCHEMY_DATABASE_URI=database_uri,
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
 )
 
-# initialize the database connection
+# DB接続初期化
 db = SQLAlchemy(app)
 
-# initialize database migration management
+# DB移行管理ツール初期化(未使用だが念の為)
 migrate = Migrate(app, db)
 
+# userlistテーブルのカラム設定
 class UserList(db.Model):
     __tablename__ = "userlist"
     username = db.Column(db.VARCHAR(), primary_key=True)
     userid = db.Column(db.VARCHAR(), nullable=False)
 
+    # UserListの引数設定をしておくと、データ追加や削除時に便利
     def __init__(self, username, userid):
         self.username = username
         self.userid = userid
 
-#環境変数取得
+# LineBot環境変数取得
 YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
 YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
 
+# LineBotAPI初期化
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
+# GETメソッド試験用
 @app.route("/")
 def hello():
+    return "Hello World"
+
+# DB接続試験用(SELECT文確認)
+@app.route("/query")
+def query():
+    dbquery = db.session.query(UserList.username, UserList.userid).all()
+    ret = str(dbquery)
+    return ret
+
+# DB接続試験用(INSERT文確認)
+@app.route("/dbadd")
+def query():
     record = UserList("UserY", "bbbbbbbb")
     db.session.add(record)
     db.session.commit()
     return "OK"
 
-@app.route("/query")
-def query():
-    dbq = db.session.query(UserList.username, UserList.userid).all()
-    ret = str(dbq)
-    return ret
-
+# POSTメソッド試験用
 @app.route('/webhook', methods=['POST'])
 def webhook():
     return '', 200, {}
 
+# LineBotのWEBHOOK用
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -78,7 +93,7 @@ def callback():
 
     return 'OK'
 
-
+# LineBotにテキスト送信があった際の挙動(”こんにちは”と返すだけ)
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     repmes = "こんにちは"
@@ -86,6 +101,7 @@ def handle_message(event):
         event.reply_token,
         TextSendMessage(text=repmes))
 
+# LineBotを友達追加した際の挙動(UserListテーブルに相手のLINEの表示名、IDを追加しつつ応答を返す)
 @handler.add(FollowEvent)
 def handle_follow(event):
     profile = line_bot_api.get_profile(event.source.user_id)
