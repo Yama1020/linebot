@@ -53,7 +53,7 @@ def hello():
 
 @app.route("/query")
 def query():
-    dbq = db.session.query(UserList.username).all()
+    dbq = db.session.query(UserList.username, UserList.userid).all()
     ret = str(dbq)
     return ret
 
