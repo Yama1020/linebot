@@ -52,7 +52,7 @@ def hello():
     return "OK"
 
 @app.route("/query")
-def hello():
+def query():
     dbq = db.session.query(UserList.username).all
     ret = str(dbq)
     return ret
