@@ -51,6 +51,12 @@ def hello():
     db.session.commit()
     return "OK"
 
+@app.route("/query")
+def hello():
+    dbq = db.session.query(UserList.username).all
+    ret = str(dbq)
+    return ret
+
 @app.route('/webhook', methods=['POST'])
 def webhook():
     return '', 200, {}
