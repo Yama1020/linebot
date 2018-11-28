@@ -46,8 +46,8 @@ handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
 @app.route("/")
 def hello():
-    ins = UserList('UserZ', 'aaaaaaaaa')
-    db.session.add(ins)
+    record = UserList("UserY", "bbbbbbbb")
+    db.session.add(record)
     db.session.commit()
     return "OK"
 
@@ -86,7 +86,7 @@ def handle_follow(event):
     followname = profile.display_name
     followid = event.source.user_id
 
-    record = UserList(username=followname, userid=followid)
+    record = UserList(followname, followid)
     db.session.add(record)
     db.session.commit()
 
