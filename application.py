@@ -64,7 +64,7 @@ def query():
 
 # DB接続試験用(INSERT文確認)
 @app.route("/dbadd")
-def query():
+def dbadd():
     record = UserList("UserY", "bbbbbbbb")
     db.session.add(record)
     db.session.commit()
