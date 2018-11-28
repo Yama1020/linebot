@@ -29,9 +29,8 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 class UserList(db.Model):
-    __tablename__ = "userlista"
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.VARCHAR(), nullable=False)
+    __tablename__ = "userlist"
+    username = db.Column(db.VARCHAR(), primary_key=True)
     userid = db.Column(db.VARCHAR(), nullable=False)
 
     def __init__(self, username, userid):
