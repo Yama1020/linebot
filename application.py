@@ -58,7 +58,7 @@ def hello():
 # DB接続試験用(SELECT文確認)
 @app.route("/query")
 def query():
-    dbquery = db.session.query(UserList.username).first()
+    dbquery = db.session.query(UserList.username).all()
     ret = str(dbquery)
     return ret
 
