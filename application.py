@@ -109,10 +109,10 @@ def handle_txtmessage(event):
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_imgmessage(event):
     message_id = event.message.id
-    message_content = str(line_bot_api.get_message_content(message_id))
+    message_content = line_bot_api.get_message_content(message_id)
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=message_content))
+        TextSendMessage(text=message_id))
  
 #    accountname = os.environ["STORAGE_NAME"]
 #    accountkey = os.environ["STORAGE_KEY"]
