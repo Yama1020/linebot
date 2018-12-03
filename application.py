@@ -112,15 +112,12 @@ def handle_txtmessage(event):
 def handle_imgmessage(event):
     message_id = event.message.id
     message_content = line_bot_api.get_message_content(message_id)
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=message_id))
- 
-#    i = Image.open(BytesIO(message_content.content))
-#    filepath = '/site/wwwroot'
-#    filename = filepath + messageid + '.jpg'
-#    i.save(filename)
-#
+
+    i = Image.open(BytesIO(message_content.content))
+    filepath = '/site/wwwroot'
+    filename = filepath + message_id + '.jpg'
+    i.save(filename)
+
 #    accountname = os.environ["STORAGE_NAME"]
 #    accountkey = os.environ["STORAGE_KEY"]
 #    block_blob_service = BlockBlobService(account_name=accountname, account_key=accountkey)
