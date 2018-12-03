@@ -6,7 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import FollowEvent, UnfollowEvent, MessageEvent, TextMessage, TextSendMessage
+from linebot.models import FollowEvent, UnfollowEvent, MessageEvent, TextMessage, ImageMessage, TextSendMessage
+
+from azure.storage.blob import BlockBlobService
 
 # Flaskアプリケーション初期化
 app = Flask(__name__)
@@ -68,6 +70,8 @@ def dbadd():
     record = UserList("UserY", "bbbbbbbb")
     db.session.add(record)
     db.session.commit()
+    dbquery = db.session.query(UserList.username, UserList.userid).all()
+    ret = str(dbquery)
     return "OK"
 
 # POSTメソッド試験用
@@ -95,11 +99,24 @@ def callback():
 
 # LineBotにテキスト送信があった際の挙動(”こんにちは”と返すだけ)
 @handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    repmes = event.message.id
+def handle_txtmessage(event):
+    replymes = event.message.id
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=repmes))
+        TextSendMessage(text=replymes))
+
+# LineBotに画像送信があった際の挙動(Blobストレージに格納)
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_imgmessage(event):
+    message_id = event.message.id
+    message_content = line_bot_api.get_message_content(message_id)
+    
+    accountname = os.environ["STORAGE_NAME"]
+    accountkey = os.environ["STORAGE_KEY"]
+    block_blob_service = BlockBlobService(account_name=accountname, account_key=accountkey)
+    container_name ='images'
+    
+    block_blob_service.create_blob_from_bytes(container_name, message_id, message_content)
 
 # LineBotを友達追加orブロック解除した際の挙動(UserListテーブルに相手のLINEの表示名、IDを追加しつつ応答を返す)
 @handler.add(FollowEvent)
