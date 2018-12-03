@@ -1,4 +1,5 @@
 import os, sys, json
+from io import BytesIO
 
 from flask import Flask, render_template, request, abort
 from flask_migrate import Migrate
@@ -9,6 +10,7 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import FollowEvent, UnfollowEvent, MessageEvent, TextMessage, ImageMessage, TextSendMessage
 
 from azure.storage.blob import BlockBlobService
+from PIL import Image
 
 # Flaskアプリケーション初期化
 app = Flask(__name__)
@@ -114,12 +116,17 @@ def handle_imgmessage(event):
         event.reply_token,
         TextSendMessage(text=message_id))
  
+#    i = Image.open(BytesIO(message_content.content))
+#    filepath = '/site/wwwroot'
+#    filename = filepath + messageid + '.jpg'
+#    i.save(filename)
+#
 #    accountname = os.environ["STORAGE_NAME"]
 #    accountkey = os.environ["STORAGE_KEY"]
 #    block_blob_service = BlockBlobService(account_name=accountname, account_key=accountkey)
 #    container_name ='images'
 #    
-#    block_blob_service.create_blob_from_bytes(container_name, message_id, message_content)
+#    block_blob_service.create_blob_from_path(container_name, message_id, filepath)
 
 # LineBotを友達追加orブロック解除した際の挙動(UserListテーブルに相手のLINEの表示名、IDを追加しつつ応答を返す)
 @handler.add(FollowEvent)
