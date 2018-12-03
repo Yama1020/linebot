@@ -114,7 +114,7 @@ def handle_imgmessage(event):
     message_content = line_bot_api.get_message_content(message_id)
 
     i = Image.open(BytesIO(message_content.content))
-    filepath = '/site/wwwroot'
+    filepath = '/site/wwwroot/'
     filename = filepath + message_id + '.jpg'
     i.save(filename)
 
