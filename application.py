@@ -109,14 +109,17 @@ def handle_txtmessage(event):
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_imgmessage(event):
     message_id = event.message.id
-    message_content = line_bot_api.get_message_content(message_id)
-    
-    accountname = os.environ["STORAGE_NAME"]
-    accountkey = os.environ["STORAGE_KEY"]
-    block_blob_service = BlockBlobService(account_name=accountname, account_key=accountkey)
-    container_name ='images'
-    
-    block_blob_service.create_blob_from_bytes(container_name, message_id, message_content)
+    message_content = str(line_bot_api.get_message_content(message_id))
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=message_content))
+ 
+#    accountname = os.environ["STORAGE_NAME"]
+#    accountkey = os.environ["STORAGE_KEY"]
+#    block_blob_service = BlockBlobService(account_name=accountname, account_key=accountkey)
+#    container_name ='images'
+#    
+#    block_blob_service.create_blob_from_bytes(container_name, message_id, message_content)
 
 # LineBotを友達追加orブロック解除した際の挙動(UserListテーブルに相手のLINEの表示名、IDを追加しつつ応答を返す)
 @handler.add(FollowEvent)
