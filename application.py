@@ -118,12 +118,12 @@ def handle_imgmessage(event):
     filename = filepath + message_id + '.jpg'
     i.save(filename)
 
-#    accountname = os.environ["STORAGE_NAME"]
-#    accountkey = os.environ["STORAGE_KEY"]
-#    block_blob_service = BlockBlobService(account_name=accountname, account_key=accountkey)
-#    container_name ='images'
-#    
-#    block_blob_service.create_blob_from_path(container_name, message_id, filepath)
+    accountname = os.environ["STORAGE_NAME"]
+    accountkey = os.environ["STORAGE_KEY"]
+    block_blob_service = BlockBlobService(account_name=accountname, account_key=accountkey)
+    container_name ='images'
+    
+    block_blob_service.create_blob_from_path(container_name, message_id, filepath)
 
 # LineBotを友達追加orブロック解除した際の挙動(UserListテーブルに相手のLINEの表示名、IDを追加しつつ応答を返す)
 @handler.add(FollowEvent)
