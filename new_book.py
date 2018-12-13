@@ -10,8 +10,9 @@ temppath = "/home/"
 csvname = "test02.csv"
 csvpath = temppath + csvname
 
-
+# 書籍名と所有者情報をCSVに追記する関数
 def book_add(title, owner):
+
     # Blobへ接続しCSVをダウンロード
     block_blob_service = BlockBlobService(account_name=accountname, account_key=accountkey)
     block_blob_service.get_blob_to_path(container_name, csvname, csvpath)

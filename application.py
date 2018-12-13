@@ -9,7 +9,6 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import FollowEvent, UnfollowEvent, MessageEvent, TextMessage, ImageMessage, TextSendMessage
 
-from azure.storage.blob import BlockBlobService
 from PIL import Image
 
 from get_title import isbnsearch
@@ -70,16 +69,6 @@ def query():
     ret = str(dbquery)
     return ret
 
-# DB接続試験用(INSERT文確認)
-@app.route("/dbadd")
-def dbadd():
-    record = UserList("UserY", "bbbbbbbb")
-    db.session.add(record)
-    db.session.commit()
-    dbquery = db.session.query(UserList.username, UserList.userid).all()
-    ret = str(dbquery)
-    return "OK"
-
 # POSTメソッド試験用
 @app.route('/webhook', methods=['POST'])
 def webhook():
@@ -103,7 +92,7 @@ def callback():
 
     return 'OK'
 
-# LineBotにテキスト送信があった際の挙動(”こんにちは”と返すだけ)
+# LineBotにテキスト送信があった際の挙動(LineIDを返す)
 @handler.add(MessageEvent, message=TextMessage)
 def handle_txtmessage(event):
     replymes = event.message.id
@@ -111,7 +100,7 @@ def handle_txtmessage(event):
         event.reply_token,
         TextSendMessage(text=replymes))
 
-# LineBotに画像送信があった際の挙動
+# LineBotに画像送信があった際の挙動(新規書籍登録)
 @handler.add(MessageEvent, message=ImageMessage)
 def handle_message(event):
     # メッセージID等を取得する、イメージをバイナリ形式で取得する
@@ -119,21 +108,29 @@ def handle_message(event):
     message_content = line_bot_api.get_message_content(message_id)
     image = BytesIO(message_content.content)
 
+    # イメージをVisionAPIに投げる(関数はVisionAPIファイル内で定義済)
     isbn = get_isbn(image)
 
+    # 返ってきた結果が数値でなければ(エラーであれば)その旨を返す
     if not isinstance(isbn, int):
         mes = isbn
+
+    # 返ってきた結果が数値なら、OpenBDに投げて書籍情報を取得する(関数はget_titleファイルで定義済)
     else:
         title = isbnsearch(isbn)
+
+        # リターンコード1ならエラー扱い
         if title[0] == 1:
             mes = title[1]
+
+        # リターンコード0なら書籍登録する(関数はnew_bookファイルで定義済)
         else:
             profile = line_bot_api.get_profile(event.source.user_id)
             owner = profile.display_name
             book_add(title[1], owner)
-            mes = "書籍" + title[1] + "を登録しました"
+            mes = title[1] + " を登録しました"
             
-    # Textをラインボット経由で出力する
+    # 結果メッセージを返信する
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=mes)

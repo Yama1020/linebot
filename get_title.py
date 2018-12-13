@@ -15,7 +15,7 @@ def isbnsearch(isbn):
   with urllib.request.urlopen(req) as res:
     body = json.load(res)
 
-  # 書名検索ができなかったら"見つかりません"と返し、できたら書名を関数の戻り値として返す
+  # 書名検索ができなかったら"見つかりません"と返し、できたらリターンコードと共に書名を関数の戻り値として返す
   if body[0] is None:
     mes = "ISBN" + str(isbn) + "の本は見つかりませんでした"
     return [1, mes]
