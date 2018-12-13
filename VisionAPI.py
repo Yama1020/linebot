@@ -47,7 +47,7 @@ def get_isbn(image):
         isbn_num = retext.group().replace(" ", "")
         isbn_num = isbn_num.replace("-", "")
         isbn_num = re.sub('[A-Z]*', "" ,isbn_num)
-        isbn_num = int(isbn_num[:12])
+        isbn_num = int(isbn_num[:13])
     else:
         isbn_num = 'ISBNが読み取れませんでした'
 
