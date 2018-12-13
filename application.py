@@ -12,6 +12,10 @@ from linebot.models import FollowEvent, UnfollowEvent, MessageEvent, TextMessage
 from azure.storage.blob import BlockBlobService
 from PIL import Image
 
+from get_title import isbnsearch
+from new_book import book_add
+from VisionAPI import get_isbn
+
 # Flaskアプリケーション初期化
 app = Flask(__name__)
 
@@ -107,26 +111,33 @@ def handle_txtmessage(event):
         event.reply_token,
         TextSendMessage(text=replymes))
 
-# LineBotに画像送信があった際の挙動(Blobストレージに格納)
+# LineBotに画像送信があった際の挙動
 @handler.add(MessageEvent, message=ImageMessage)
-def handle_imgmessage(event):
+def handle_message(event):
+    # メッセージID等を取得する、イメージをバイナリ形式で取得する
     message_id = event.message.id
     message_content = line_bot_api.get_message_content(message_id)
+    image = BytesIO(message_content.content)
 
-    i = Image.open(BytesIO(message_content.content))
-    filepath = '/home/'
-    filename = message_id + '.jpg'
-    fulpath = filepath + filename
-    i.save(filename)
+    isbn = get_isbn(image)
 
-    accountname = os.environ["STORAGE_NAME"]
-    accountkey = os.environ["STORAGE_KEY"]
-    block_blob_service = BlockBlobService(account_name=accountname, account_key=accountkey)
-    container_name ='images'
-    
-    block_blob_service.create_blob_from_path(container_name, filename, fulpath)
-
-    os.remove(fulpath)
+    if not isinstance(isbn, int):
+        mes = isbn
+    else:
+        title = isbnsearch(isbn)
+        if title[0] == 1:
+            mes = title[1]
+        else:
+            profile = line_bot_api.get_profile(event.source.user_id)
+            owner = profile.display_name
+            book_add(title[1], owner)
+            mes = "書籍" + title[1] + "を登録しました"
+            
+    # Textをラインボット経由で出力する
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=mes)
+    )
 
 # LineBotを友達追加orブロック解除した際の挙動(UserListテーブルに相手のLINEの表示名、IDを追加しつつ応答を返す)
 @handler.add(FollowEvent)
