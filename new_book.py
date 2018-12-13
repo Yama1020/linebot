@@ -18,7 +18,7 @@ def book_add(title, owner):
 
     # CSVに新規図書を追加し再アップロード
     w = pd.DataFrame([[title, "0", "0", owner, "0", "0", "1F"]])
-    w.to_csv(temppath, index=False, encoding="utf-8", mode='a', header=False)
+    w.to_csv(csvpath, index=False, encoding="utf-8", mode='a', header=False)
     block_blob_service.create_blob_from_path(container_name, csvname, csvpath)
 
     # ローカルファイルを削除
