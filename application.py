@@ -107,7 +107,7 @@ def handle_message(event):
     service.get_blob_to_path(container_name,file_name,file_name)
     service.get_blob_to_path(container_name,file_name1,file_name1)
     
-    df1 = pd.read_csv(file_name1,encoding="shift_jis", sep=",")
+    df1 = pd.read_csv(file_name1,encoding="utf-8", sep=",")
     
     profile = line_bot_api.get_profile(event.source.user_id)
     user_disp_name = profile.display_name
@@ -129,7 +129,7 @@ def handle_message(event):
         df2 = pd.DataFrame(data=[[user_id,user_disp_name,0]],columns=['LINEID','username','userstatus'])
         df3 = df1.append(df2, ignore_index=True)
         df3 = df3.drop(["Unnamed: 0"],axis=1)
-        df3.to_csv(file_name1,encoding="shift_jis")
+        df3.to_csv(file_name1,encoding="utf-8")
         service.create_blob_from_path(container_name,file_name1,file_name1)
     
     # ステータス確認
@@ -157,7 +157,7 @@ def handle_message(event):
                 if row["LINEID"] ==  user_id:
                     df1.loc[index, 'userstatus'] = 1
             df1 = df1.drop(["Unnamed: 0"],axis=1)
-            df1.to_csv(file_name1,encoding="shift_jis")
+            df1.to_csv(file_name1,encoding="utf-8")
             service.create_blob_from_path(container_name,file_name1,file_name1)
 
         # 借りる案内
@@ -167,7 +167,7 @@ def handle_message(event):
                 if row["LINEID"] ==  user_id:
                     df1.loc[index, 'userstatus'] = 2
             df1 = df1.drop(["Unnamed: 0"],axis=1)
-            df1.to_csv(file_name1,encoding="shift_jis")
+            df1.to_csv(file_name1,encoding="utf-8")
             service.create_blob_from_path(container_name,file_name1,file_name1)
 
         # 返す案内
@@ -177,7 +177,7 @@ def handle_message(event):
                 if row["LINEID"] ==  user_id:
                     df1.loc[index, 'userstatus'] = 3
             df1 = df1.drop(["Unnamed: 0"],axis=1)
-            df1.to_csv(file_name1,encoding="shift_jis")
+            df1.to_csv(file_name1,encoding="utf-8")
             service.create_blob_from_path(container_name,file_name1,file_name1)
 
         # 意味わからん文字打ってきたやつ向けに
@@ -198,7 +198,7 @@ def handle_message(event):
             if row["LINEID"] ==  user_id:
                 df1.loc[index, 'userstatus'] = 0
                 df1 = df1.drop(["Unnamed: 0"],axis=1)
-                df1.to_csv(file_name1,encoding="shift_jis")
+                df1.to_csv(file_name1,encoding="utf-8")
                 service.create_blob_from_path(container_name,file_name1,file_name1)
     
     
@@ -237,7 +237,7 @@ def handle_message(event):
             if row["LINEID"] ==  user_id:
                 df1.loc[index, 'userstatus'] = 0
                 df1 = df1.drop(["Unnamed: 0"],axis=1)
-                df1.to_csv(file_name1,encoding="shift_jis")
+                df1.to_csv(file_name1,encoding="utf-8")
                 service.create_blob_from_path(container_name,file_name1,file_name1)
     
     # 返す処理
@@ -272,7 +272,7 @@ def handle_message(event):
             if row["LINEID"] ==  user_id:
                 df1.loc[index, 'userstatus'] = 0
                 df1 = df1.drop(["Unnamed: 0"],axis=1)
-                df1.to_csv(file_name1,encoding="shift_jis")
+                df1.to_csv(file_name1,encoding="utf-8")
                 service.create_blob_from_path(container_name,file_name1,file_name1)
     
     # ユーザーの状態が意味わからんくなったとき0にもどす
@@ -281,7 +281,7 @@ def handle_message(event):
             if row["LINEID"] ==  user_id:
                 df1.loc[index, 'userstatus'] = 0
                 df1 = df1.drop(["Unnamed: 0"],axis=1)
-                df1.to_csv(file_name1,encoding="shift_jis")
+                df1.to_csv(file_name1,encoding="utf-8")
                 service.create_blob_from_path(container_name,file_name1,file_name1)
     
     # ファイルの削除
