@@ -143,7 +143,7 @@ def handle_message(event):
 
         # 一覧表示
         if event.message.text == "一覧" or event.message.text == "いちらん":
-            df = pd.read_csv(file_name,encoding="shift_jis", sep=",")
+            df = pd.read_csv(file_name,encoding="utf-8", sep=",")
             list = []
             for index, row in df.iterrows():
                 list.append(row["title"])
@@ -187,7 +187,7 @@ def handle_message(event):
     
     # 検索処理
     elif status == 1:
-        df = pd.read_csv(file_name,encoding="shift_jis", sep=",")
+        df = pd.read_csv(file_name,encoding="utf-8", sep=",")
         list = []
         for index, row in df.iterrows():
             if row["title"].find(event.message.text) != -1:
@@ -205,7 +205,7 @@ def handle_message(event):
     
     # 借りる処理
     elif status == 2:
-        df = pd.read_csv(file_name,encoding="shift_jis", sep=",")
+        df = pd.read_csv(file_name,encoding="utf-8", sep=",")
         messages = ""
         for index, row in df.iterrows():
             # 指定されたタイトル名の本があった場合
@@ -229,7 +229,7 @@ def handle_message(event):
                     messages = "そんな本ないよ"
     
         df = df.drop(["Unnamed: 0"],axis=1)
-        df.to_csv(file_name,encoding="shift_jis")
+        df.to_csv(file_name,encoding="utf-8")
         
         service.create_blob_from_path(container_name,file_name,file_name)
         
@@ -242,7 +242,7 @@ def handle_message(event):
     
     # 返す処理
     elif status == 3:
-        df = pd.read_csv(file_name,encoding="shift_jis", sep=",")
+        df = pd.read_csv(file_name,encoding="utf-8", sep=",")
         messages = ""
         user_id = event.source.user_id
         for index, row in df.iterrows():
@@ -264,7 +264,7 @@ def handle_message(event):
                 if messages != "借りてないよ":
                     messages = "そんな本ないよ"
         df = df.drop(["Unnamed: 0"],axis=1)
-        df.to_csv(file_name,encoding="shift_jis")
+        df.to_csv(file_name,encoding="utf-8")
         
         service.create_blob_from_path(container_name,file_name,file_name)
         
