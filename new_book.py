@@ -29,7 +29,7 @@ def book_add(title, owner):
 
     # マツコSTRGにもアップロード
     block_blob_service2 = BlockBlobService(account_name=account2_name, account_key=account2_key)
-    block_blob_service.create_blob_from_path(container2_name, file2_name, csvpath)
+    block_blob_service2.create_blob_from_path(container2_name, file2_name, csvpath)
 
     # ローカルファイルを削除
     os.remove(csvpath)

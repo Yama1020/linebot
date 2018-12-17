@@ -1,6 +1,7 @@
 import os, sys, json
 from io import BytesIO
-
+import pandas as pd
+from datetime import datetime
 from flask import Flask, render_template, request, abort
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -8,6 +9,8 @@ from flask_sqlalchemy import SQLAlchemy
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import FollowEvent, UnfollowEvent, MessageEvent, TextMessage, ImageMessage, TextSendMessage
+
+from azure.storage.blob import BlockBlobService
 
 from PIL import Image
 
@@ -292,7 +295,7 @@ def handle_message(event):
 
 # LineBotに画像送信があった際の挙動(新規書籍登録)
 @handler.add(MessageEvent, message=ImageMessage)
-def handle_message(event):
+def handle_imgmessage(event):
     # メッセージID等を取得する、イメージをバイナリ形式で取得する
     message_id = event.message.id
     message_content = line_bot_api.get_message_content(message_id)
