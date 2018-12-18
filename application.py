@@ -1,26 +1,56 @@
-from flask import Flask, request, abort
- 
-from linebot import (
-    LineBotApi, WebhookHandler
-)
-from linebot.exceptions import (
-    InvalidSignatureError
-)
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
-)
-import os
-
+import os, sys, json
+from io import BytesIO
 import pandas as pd
-
 import datetime
+from flask import Flask, render_template, request, abort
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
-from azure.storage.blob import (
-    BlockBlobService, PublicAccess
-)
+from linebot import LineBotApi, WebhookHandler
+from linebot.exceptions import InvalidSignatureError
+from linebot.models import FollowEvent, UnfollowEvent, MessageEvent, TextMessage, ImageMessage, TextSendMessage
+
+from azure.storage.blob import BlockBlobService, PublicAccess
+
+from PIL import Image
+
+from get_title import isbnsearch
+from new_book import book_add
+from VisionAPI import get_isbn
 
 app = Flask(__name__)
- 
+
+# DB接続設定(セキュリティの為、各値は環境変数に記載)
+database_uri = 'postgresql://{dbuser}:{dbpass}@{dbhost}/{dbname}?client_encoding=utf8'.format(
+    dbuser=os.environ["DB_USER"],
+    dbpass=os.environ["DB_PASS"],
+    dbhost=os.environ["DB_HOST"],
+    dbname=os.environ["DB_NAME"]
+)
+
+# Flaskアプリケーションに、DB接続設定を付与
+app.config.update(
+    SQLALCHEMY_DATABASE_URI=database_uri,
+    SQLALCHEMY_TRACK_MODIFICATIONS=False,
+)
+
+# DB接続初期化
+db = SQLAlchemy(app)
+
+# DB移行管理ツール初期化(未使用だが念の為)
+migrate = Migrate(app, db)
+
+# userlistテーブルのカラム設定
+class UserList(db.Model):
+    __tablename__ = "userlist"
+    username = db.Column(db.VARCHAR(), primary_key=True)
+    userid = db.Column(db.VARCHAR(), nullable=False)
+
+    # UserListの引数設定をしておくと、データ追加や削除時に便利
+    def __init__(self, username, userid):
+        self.username = username
+        self.userid = userid
+
 #環境変数取得
 # LINE Developersで設定されているアクセストークンとChannel Secretをを取得し、設定します。
 YOUR_CHANNEL_ACCESS_TOKEN = os.environ["YOUR_CHANNEL_ACCESS_TOKEN"]
@@ -28,7 +58,23 @@ YOUR_CHANNEL_SECRET = os.environ["YOUR_CHANNEL_SECRET"]
  
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
- 
+
+# GETメソッド試験用
+@app.route("/")
+def hello():
+    return "Hello World"
+
+# DB接続試験用(SELECT文確認)
+@app.route("/query")
+def query():
+    dbquery = db.session.query(UserList.username).all()
+    ret = str(dbquery)
+    return ret
+
+# POSTメソッド試験用
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    return '', 200, {}
  
 ## 1 ##
 #Webhookからのリクエストをチェックします。
