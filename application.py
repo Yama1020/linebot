@@ -119,15 +119,24 @@ def handle_message(event):
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    # マツコ用
     account_name='ds1bd5mtst'
     account_key='QRW6ikCh6i2TAOZsJnAuliDJX03xU8xmm3GVhsLFD8cw3Z9yjOLZVE3CYdgKpV+74D4y1dKCsK6bd5fjUup3LQ=='
     container_name='testcontainer'
     file_name='bookdata.csv'
     file_name1='userdata.csv'
-    
+
     service = BlockBlobService(account_name=account_name,account_key=account_key)
     service.get_blob_to_path(container_name,file_name,file_name)
     service.get_blob_to_path(container_name,file_name1,file_name1)
+
+    # 山本用
+    accountname2 = os.environ["STORAGE_NAME"]
+    accountkey2 = os.environ["STORAGE_KEY"]
+    container_name2 ='testcontainer'
+    csvname2 = "test02.csv"
+
+    service2 = BlockBlobService(account_name=accountname2, account_key=accountkey2)
     
     df1 = pd.read_csv(file_name1,encoding="utf-8", sep=",")
     
@@ -254,6 +263,7 @@ def handle_message(event):
         df.to_csv(file_name,encoding="utf-8")
         
         service.create_blob_from_path(container_name,file_name,file_name)
+        service2.create_blob_from_path(container_name,csvname2,file_name)
         
         for index, row in df1.iterrows():
             if row["LINEID"] ==  user_id:
@@ -292,6 +302,7 @@ def handle_message(event):
         df.to_csv(file_name,encoding="utf-8")
         
         service.create_blob_from_path(container_name,file_name,file_name)
+        service2.create_blob_from_path(container_name,csvname2,file_name)
         
         for index, row in df1.iterrows():
             if row["LINEID"] ==  user_id:
