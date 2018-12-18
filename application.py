@@ -404,10 +404,62 @@ def handle_message(event):
         event.reply_token,
         TextSendMessage(text=messages)) # messagesに代入されている値を返してくれる
  
-# ポート番号の設定
-if __name__ == "__main__":
-#    app.run()
-#    下のやつなんや
-    port = int(os.getenv("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+ # LineBotに画像送信があった際の挙動(新規書籍登録)
+@handler.add(MessageEvent, message=ImageMessage)
+def handle_image(event):
+    # メッセージID等を取得する、イメージをバイナリ形式で取得する
+    message_id = event.message.id
+    message_content = line_bot_api.get_message_content(message_id)
+    image = BytesIO(message_content.content)
+
+    # イメージをVisionAPIに投げる(関数はVisionAPIファイル内で定義済)
+    isbn = get_isbn(image)
+
+    # 返ってきた結果が数値でなければ(エラーであれば)その旨を返す
+    if not isinstance(isbn, int):
+        mes = isbn
+
+    # 返ってきた結果が数値なら、OpenBDに投げて書籍情報を取得する(関数はget_titleファイルで定義済)
+    else:
+        title = isbnsearch(isbn)
+
+        # リターンコード1ならエラー扱い
+        if title[0] == 1:
+            mes = title[1]
+
+        # リターンコード0なら書籍登録する(関数はnew_bookファイルで定義済)
+        else:
+            profile = line_bot_api.get_profile(event.source.user_id)
+            owner = profile.display_name
+            book_add(title[1], owner)
+            mes = title[1] + " を登録しました"
+            
+    # 結果メッセージを返信する
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=mes)
+    )
+
+# LineBotを友達追加orブロック解除した際の挙動(UserListテーブルに相手のLINEの表示名、IDを追加しつつ応答を返す)
+@handler.add(FollowEvent)
+def handle_follow(event):
+    profile = line_bot_api.get_profile(event.source.user_id)
+    followname = profile.display_name
+    followid = event.source.user_id
+
+    record = UserList(followname, followid)
+    db.session.add(record)
+    db.session.commit()
+
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="thanks for your following"))
+
+# LineBotをブロックした際の挙動(UserListテーブルから相手のLINEの表示名、IDを削除する)
+@handler.add(UnfollowEvent)
+def handle_unfollow(event):
+    unfollowid = event.source.user_id
+
+    db.session.query(UserList).filter(UserList.userid==unfollowid).delete()
+    db.session.commit()
 
