@@ -121,7 +121,7 @@ def handle_message(event):
 def handle_message(event):
     # マツコ用
     account_name='ds1bd5mtst'
-    account_key=os.environ["STORAGE2_KEY"]
+    account_key='Xdd9cdkffXUdKCsHjsKBMZsS8MwX00JN5RepUuXIl9ePUZsUa2aBEy75RAnNmnxCerikRU+XYoTy7h/81ndllA=='
     container_name='testcontainer'
     file_name='bookdata.csv'
     file_name1='userdata.csv'
